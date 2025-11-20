@@ -1,5 +1,7 @@
 import os
 import urllib3
+from io import StringIO
+from contextlib import redirect_stdout
 
 # Suppress SSL warnings
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
@@ -26,10 +28,21 @@ agent = Agent(
     # ... other args like tools, model, etc.
 )
 
-question1 = "How are you? My name is Bob, I like swimming."
-print(f"------------------ question 1: {question1}")
-resp = agent(question1)
+print(f"OpenSearch Agentic Memory Demo - Session: {session_id}")
+print("Type 'q' or 'quit' to end the conversation\n")
 
-question2 = "Do you know my name?"
-print(f"\n\n------------------ question 2: {question2}")
-resp = agent("Do you know my name?")
+while True:
+    question = input("You: ").strip()
+    
+    if question.lower() in ['q', 'quit']:
+        print("Goodbye!")
+        break
+    
+    if not question:
+        continue
+    
+    # Suppress Agent's internal printing
+    with redirect_stdout(StringIO()):
+        response = agent(question)
+    print(f"Assistant: {response}")
+    print()

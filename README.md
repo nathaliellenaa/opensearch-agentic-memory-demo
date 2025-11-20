@@ -39,3 +39,24 @@ export AWS_SESSION_TOKEN=<your_aws_session_token>
 ```bash
 python strands/short_term/strands_short_term.py
 ```
+
+The script creates an interactive chat session where you can converse with the AI agent. The agent maintains conversation history using OpenSearch's persistent memory.
+
+- Enter your messages at the "You:" prompt
+- Type `q` or `quit` to exit
+
+**Example conversation:**
+```
+Created memory container with id 'Wac4o5oB6Os6SYy-CAwu'
+OpenSearch Agentic Memory Demo - Session: demo_session
+Type 'q' or 'quit' to end the conversation
+
+You: Hello, my name is Bob and I enjoy swimming.
+Assistant: Hi Bob! Nice to meet you. Swimming is a great exercise!
+
+You: Do you remember my name?
+Assistant: Yes, your name is Bob. You mentioned it when you introduced yourself.
+
+You: q
+Goodbye!
+```
