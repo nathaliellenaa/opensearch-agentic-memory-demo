@@ -1,4 +1,5 @@
 import requests
+import os
 from typing import Dict, Optional, Any
 
 
@@ -6,17 +7,24 @@ class OpenSearchAgenticMemory:
     def __init__(self, cluster_url: str, username: str, password: str,
                  memory_container_id: str = None,
                  memory_container_name: str = "Strands agent memory container",
-                 memory_container_description: str = "default"):
+                 memory_container_description: str = "default",
+                 embedding_model_id: Optional[str] = None,
+                 llm_id: Optional[str] = None,
+                 infer: bool = False,
+                 long_term: bool = False):
         self.memory_container_id = memory_container_id
         self.memory_container_name = memory_container_name
         self.base_url = cluster_url
         self.auth = (username, password)
         self.headers = {"Content-Type": "application/json"}
+        self.embedding_model_id = embedding_model_id
+        self.llm_id = llm_id
+        self.long_term = long_term
 
         if memory_container_id is None:
             default_container_id = self.get_memory_container(memory_container_name)
-            if default_container_id is None:
-                self.create_memory_container(memory_container_name, memory_container_description, memory_container_name)
+            if default_container_id is None:                
+                self.create_memory_container(memory_container_name, memory_container_description, memory_container_name, embedding_model_id, llm_id, long_term)
             else:
                 print("Find memory container with id '{}' by name '{}'".format(default_container_id, memory_container_name))
                 self.memory_container_id = default_container_id
@@ -54,17 +62,46 @@ class OpenSearchAgenticMemory:
 
     def create_memory_container(self, name: str, description: str, index_prefix: str,
                                 embedding_model_id: Optional[str] = None,
-                                llm_id: Optional[str] = None) -> Dict:
+                                llm_id: Optional[str] = None,
+                                long_term: bool = False) -> Dict:
         url = f"{self.base_url}/_plugins/_ml/memory_containers/_create"
-        body = {
-            "name": name,
-            "description": description,
-            "configuration": {
-                "index_prefix": index_prefix,
-                "use_system_index": False,
-                "disable_session": False
+
+        # Long-term memory
+        if long_term:
+            # Auto-create models if not provided
+            if not embedding_model_id:
+                embedding_model_id = self._create_embedding_model()
+            if not llm_id:
+                llm_id = self._create_llm_model()
+            body = {
+                "name": name,
+                "description": description,
+                "configuration": {
+                    "index_prefix": index_prefix,
+                    "embedding_model_type": "TEXT_EMBEDDING",
+                    "embedding_model_id": embedding_model_id,
+                    "embedding_dimension": 1024,
+                    "llm_id": llm_id,
+                    "strategies": [
+                        {
+                            "enabled": True,
+                            "type": "SEMANTIC",
+                            "namespace": ["user_id"]
+                        }
+                    ]
+                }
             }
-        }
+        else:
+            # Short-term memory
+            body = {
+                "name": name,
+                "description": description,
+                "configuration": {
+                    "index_prefix": index_prefix,
+                    "use_system_index": False,
+                    "disable_session": False
+                }
+            }
 
         response = self._make_request("POST", url, json=body)
         self.memory_container_id = response['memory_container_id']
@@ -104,14 +141,18 @@ class OpenSearchAgenticMemory:
 
         return self._make_request("DELETE", url)
 
-    def add_message(self, session_id: str, agent_id: str, message: Dict[str, Any]) -> Dict:
+    def add_message(self, session_id: str, agent_id: str, message: Dict[str, Any], infer: bool = False, user_id: str = None) -> Dict:
         url = f"{self.base_url}/_plugins/_ml/memory_containers/{self.memory_container_id}/memories"
+        namespace = {
+            "session_id": session_id,
+            "agent_id": agent_id,
+        }
+        if user_id:
+            namespace["user_id"] = user_id
+            
         body = {
-            "namespace": {
-                "session_id": session_id,
-                "agent_id": agent_id,
-            },
-            "infer": False,
+            "namespace": namespace,
+            "infer": infer,
             "memory_type": "conversational",
         }
         if "message" in message:
@@ -355,3 +396,140 @@ class OpenSearchAgenticMemory:
         except Exception as e:
             print(f"Error occurred while extracting _source: {str(e)}")
             return None
+    
+    def _create_embedding_model(self) -> str:
+        """Create Amazon Bedrock Titan embedding model for long-term memory"""
+        url = f"{self.base_url}/_plugins/_ml/models/_register"
+        aws_region = os.getenv("AWS_REGION", "us-east-1")
+        aws_access_key = os.getenv("AWS_ACCESS_KEY_ID")
+        aws_secret_key = os.getenv("AWS_SECRET_ACCESS_KEY")
+        aws_session_token = os.getenv("AWS_SESSION_TOKEN")
+
+        body = {
+            "name": "Bedrock embedding model",
+            "function_name": "remote",
+            "description": "test model",
+            "connector": {
+                "name": "Amazon Bedrock Connector: embedding",
+                "description": "The connector to bedrock Titan embedding model",
+                "version": 1,
+                "protocol": "aws_sigv4",
+                "parameters": {
+                    "region": aws_region,
+                    "service_name": "bedrock",
+                    "model": "amazon.titan-embed-text-v2:0",
+                    "dimensions": 1024,
+                    "normalize": True,
+                    "embeddingTypes": [
+                        "float"
+                    ]
+                },
+                "credential": {
+                    "access_key": aws_access_key,
+                    "secret_key": aws_secret_key,
+                    "session_token": aws_session_token
+                },
+                "actions": [
+                    {
+                        "action_type": "predict",
+                        "method": "POST",
+                        "url": "https://bedrock-runtime.${parameters.region}.amazonaws.com/model/${parameters.model}/invoke",
+                        "headers": {
+                            "content-type": "application/json",
+                            "x-amz-content-sha256": "required"
+                        },
+                        "request_body": "{ \"inputText\": \"${parameters.inputText}\", \"dimensions\": ${parameters.dimensions}, \"normalize\": ${parameters.normalize}, \"embeddingTypes\": ${parameters.embeddingTypes} }",
+                        "pre_process_function": "connector.pre_process.bedrock.embedding",
+                        "post_process_function": "connector.post_process.bedrock.embedding"
+                    }
+                ]
+            }
+        }
+
+        response = self._make_request("POST", url, json=body)
+        self.embedding_model_id = response['model_id']
+        print("Created embedding model with id '{}'".format(self.embedding_model_id))
+        return self.embedding_model_id
+        
+    def _create_llm_model(self) -> str:
+        """Create Amazon Bedrock LLM model for long-term memory"""
+        aws_region = os.getenv("AWS_REGION", "us-east-1")
+        aws_access_key = os.getenv("AWS_ACCESS_KEY_ID")
+        aws_secret_key = os.getenv("AWS_SECRET_ACCESS_KEY")
+        aws_session_token = os.getenv("AWS_SESSION_TOKEN")
+        
+        url = f"{self.base_url}/_plugins/_ml/models/_register"
+        body = {
+        "name": "Bedrock infer model",
+        "function_name": "remote",
+        "description": "LLM model for memory processing",
+        "connector": {
+                "name": "Amazon Bedrock Connector: LLM",
+                "description": "The connector to bedrock Claude 3.7 sonnet model",
+                "version": 1,
+                "protocol": "aws_sigv4",
+                "parameters": {
+                    "region": aws_region,
+                    "service_name": "bedrock",
+                    "max_tokens": 8000,
+                    "temperature": 1,
+                    "anthropic_version": "bedrock-2023-05-31",
+                    "model": "us.anthropic.claude-3-7-sonnet-20250219-v1:0"
+                },
+                "credential": {
+                    "access_key": aws_access_key,
+                    "secret_key": aws_secret_key,
+                    "session_token": aws_session_token
+                },
+                "actions": [{
+                    "action_type": "predict",
+                    "method": "POST",
+                    "headers": {"content-type": "application/json"},
+                    "url": "https://bedrock-runtime.${parameters.region}.amazonaws.com/model/${parameters.model}/converse",
+                    "request_body": "{  \"anthropic_version\": \"${parameters.anthropic_version}\", \"max_tokens\": ${parameters.max_tokens}, \"temperature\": ${parameters.temperature}, \"system\": [{\"text\": \"${parameters.system_prompt}\"}], \"messages\": [ { \"role\": \"user\", \"content\": [ {\"text\": \"${parameters.user_prompt}\" }] }]}"
+                }]
+            }
+        }
+        
+        model_response = self._make_request("POST", url, json=body)
+        self.llm_id = model_response['model_id']
+        print(f"Created LLM model with id '{self.llm_id}'")
+        return self.llm_id
+
+    def search_long_term_memories(self, query: str, user_id: str) -> list[Dict[str, Any]]:
+        """Search long-term memories using semantic search"""
+        url = f"{self.base_url}/_plugins/_ml/memory_containers/{self.memory_container_id}/memories/long-term/_search"
+        body = {
+            "query": {
+                "bool": {
+                    "filter": [
+                        {
+                            "term": {
+                                "namespace.user_id": user_id
+                            }
+                        }
+                    ]
+                }
+            },
+            "sort": [
+                {
+                    "created_time": {
+                        "order": "desc"
+                    }
+                }
+            ],
+            "size": 10
+        }
+        
+        response = self._make_request("GET", url, json=body)
+        return self._get_hits(response) or []
+
+    def get_long_term_memory(self, memory_id: str) -> Dict[str, Any]:
+        """Get a specific long-term memory by ID"""
+        url = f"{self.base_url}/_plugins/_ml/memory_containers/{self.memory_container_id}/memories/long-term/{memory_id}"
+        return self._make_request("GET", url)
+
+    def delete_long_term_memory(self, memory_id: str) -> Dict[str, Any]:
+        """Delete a specific long-term memory by ID"""
+        url = f"{self.base_url}/_plugins/_ml/memory_containers/{self.memory_container_id}/memories/long-term/{memory_id}"
+        return self._make_request("DELETE", url)
