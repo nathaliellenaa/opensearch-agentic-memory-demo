@@ -19,9 +19,9 @@ export OPENSEARCH_USERNAME=<your_opensearch_domain_username>
 export OPENSEARCH_PASSWORD=<your_opensearch_domain_password>
 
 # Memory and session configuration (Optional)
-export MEMORY_CONTAINER_NAME=<your_memory_container_name>               # Defaults to 'demo_memory_container'
+export MEMORY_CONTAINER_NAME=<your_memory_container_name>               # Defaults to 'demo_short_term_memory'
 export MEMORY_CONTAINER_DESCRIPTION=<your_memory_container_description> # Defaults to 'OpenSearch Strands demo memory container'
-export SESSION_ID=<your_session_id>                                     # Defaults to 'demo_session'
+export SESSION_ID=<your_session_id>                                     # Defaults to 'demo_short_term_session'
 ```
 
 3. Set AWS credentials to use Amazon Bedrock
@@ -80,8 +80,8 @@ export EMBEDDING_MODEL_ID=<your_embedding_model_id>        # Defaults to Amazon 
 export LLM_MODEL_ID=<your_llm_model_id>                    # Default to Amazon Bedrock Claude model
 
 # Memory and session configuration (Optional)
-export MEMORY_CONTAINER_NAME=<your_memory_container_name>  # Defaults to 'demo_memory_container'
-export SESSION_ID=<your_session_id>                        # Defaults to 'demo_session'
+export MEMORY_CONTAINER_NAME=<your_memory_container_name>  # Defaults to 'demo_long_term_memory'
+export SESSION_ID=<your_session_id>                        # Defaults to 'demo_long_term_session'
 export USER_ID=<your_user_id>                              # Defaults to 'demo_user'
 export AGENT_ID=<your_agent_id>                            # Defaults to 'demo_agent'
 

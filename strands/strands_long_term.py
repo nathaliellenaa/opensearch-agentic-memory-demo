@@ -17,8 +17,8 @@ embedding_model_id = os.getenv('EMBEDDING_MODEL_ID')
 llm_id = os.getenv('LLM_MODEL_ID')
 
 # Memory and session configuration
-memory_container_name = os.getenv('MEMORY_CONTAINER_NAME', 'demo_memory_container')
-session_id = os.getenv('SESSION_ID', 'demo_session')
+memory_container_name = os.getenv('MEMORY_CONTAINER_NAME', 'demo_long_term_memory')
+session_id = os.getenv('SESSION_ID', 'demo_long_term_session')
 user_id = os.getenv('USER_ID', 'demo_user')
 agent_id = os.getenv('AGENT_ID', 'demo_agent')
 

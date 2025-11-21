@@ -82,6 +82,8 @@ class OpenSearchAgenticMemory:
                     "embedding_model_id": embedding_model_id,
                     "embedding_dimension": 1024,
                     "llm_id": llm_id,
+                    "use_system_index": False,
+                    "disable_session": False,
                     "strategies": [
                         {
                             "enabled": True,

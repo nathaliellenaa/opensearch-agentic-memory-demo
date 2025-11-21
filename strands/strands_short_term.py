@@ -13,9 +13,9 @@ from opensearch_session_manager import OpenSearchSessionRepository
 cluster_url = os.getenv('OPENSEARCH_DOMAIN_URL')
 username = os.getenv('OPENSEARCH_USERNAME')
 password = os.getenv('OPENSEARCH_PASSWORD')
-memory_container_name = os.getenv('MEMORY_CONTAINER_NAME', 'demo_memory_container')
+memory_container_name = os.getenv('MEMORY_CONTAINER_NAME', 'demo_short_term_memory')
 memory_container_description = os.getenv('MEMORY_CONTAINER_DESCRIPTION', 'OpenSearch Strands demo memory container')
-session_id = os.getenv('SESSION_ID', 'demo_session')
+session_id = os.getenv('SESSION_ID', 'demo_short_term_session')
 
 repo = OpenSearchSessionRepository(cluster_url, username, password,
                                    memory_container_name=memory_container_name,
