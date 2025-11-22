@@ -1,7 +1,5 @@
 import os
 import urllib3
-from io import StringIO
-from contextlib import redirect_stdout
 
 # Suppress SSL warnings
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
@@ -10,10 +8,13 @@ from strands.session.repository_session_manager import RepositorySessionManager
 from strands import Agent
 from opensearch_session_manager import OpenSearchSessionRepository
 
-cluster_url = os.getenv('OPENSEARCH_DOMAIN_URL')
+# Opensearch domain configuration
+cluster_url = os.getenv('OPENSEARCH_URL')
 username = os.getenv('OPENSEARCH_USERNAME')
 password = os.getenv('OPENSEARCH_PASSWORD')
-memory_container_name = os.getenv('MEMORY_CONTAINER_NAME', 'demo_short_term_memory')
+
+# Memory and session configuration
+memory_container_name = os.getenv('MEMORY_CONTAINER_NAME', 'strands_short_term')
 memory_container_description = os.getenv('MEMORY_CONTAINER_DESCRIPTION', 'OpenSearch Strands demo memory container')
 session_id = os.getenv('SESSION_ID', 'demo_short_term_session')
 

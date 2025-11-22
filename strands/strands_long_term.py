@@ -8,7 +8,7 @@ from strands import Agent
 from opensearch_memory_tool import OpenSearchMemoryToolProvider
 
 # Opensearch domain configuration
-cluster_url = os.getenv('OPENSEARCH_DOMAIN_URL')
+cluster_url = os.getenv('OPENSEARCH_URL')
 username = os.getenv('OPENSEARCH_USERNAME')
 password = os.getenv('OPENSEARCH_PASSWORD')
 
@@ -17,7 +17,7 @@ embedding_model_id = os.getenv('EMBEDDING_MODEL_ID')
 llm_id = os.getenv('LLM_MODEL_ID')
 
 # Memory and session configuration
-memory_container_name = os.getenv('MEMORY_CONTAINER_NAME', 'demo_long_term_memory')
+memory_container_name = os.getenv('MEMORY_CONTAINER_NAME', 'strands_long_term')
 session_id = os.getenv('SESSION_ID', 'demo_long_term_session')
 user_id = os.getenv('USER_ID', 'demo_user')
 agent_id = os.getenv('AGENT_ID', 'demo_agent')

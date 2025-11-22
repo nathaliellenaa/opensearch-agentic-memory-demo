@@ -23,18 +23,18 @@ pip install -r requirements.txt
 1. Set environment variables
 
 ```bash
-# OpenSearch domain configuration (required)
-export OPENSEARCH_DOMAIN_URL=<your_opensearch_domain_endpoint>
+# OpenSearch domain configuration (Required)
+export OPENSEARCH_URL=<your_opensearch_cluster_endpoint>
 export OPENSEARCH_USERNAME=<your_opensearch_domain_username>
 export OPENSEARCH_PASSWORD=<your_opensearch_domain_password>
 
 # Memory and session configuration (Optional)
-export MEMORY_CONTAINER_NAME=<your_memory_container_name>               # Defaults to 'demo_short_term_memory'
+export MEMORY_CONTAINER_NAME=<your_memory_container_name>               # Defaults to 'strands_short_term'
 export MEMORY_CONTAINER_DESCRIPTION=<your_memory_container_description> # Defaults to 'OpenSearch Strands demo memory container'
 export SESSION_ID=<your_session_id>                                     # Defaults to 'demo_short_term_session'
 ```
 
-2. Set AWS credentials to use Amazon Bedrock
+2. Set AWS credentials for Amazon Bedrock model
 
 ```bash
 export AWS_ACCESS_KEY_ID=<your_aws_access_key>
@@ -74,8 +74,8 @@ Type 'q' or 'quit' to end the conversation
 1. Set environment variables
 
 ```bash
-# OpenSearch domain configuration (required)
-export OPENSEARCH_DOMAIN_URL=<your_opensearch_domain_endpoint>
+# OpenSearch domain configuration (Required)
+export OPENSEARCH_URL=<your_opensearch_cluster_endpoint>
 export OPENSEARCH_USERNAME=<your_opensearch_domain_username>
 export OPENSEARCH_PASSWORD=<your_opensearch_domain_password>
 
@@ -84,7 +84,7 @@ export EMBEDDING_MODEL_ID=<your_embedding_model_id>        # Defaults to Amazon 
 export LLM_MODEL_ID=<your_llm_model_id>                    # Default to Amazon Bedrock Claude model
 
 # Memory and session configuration (Optional)
-export MEMORY_CONTAINER_NAME=<your_memory_container_name>  # Defaults to 'demo_long_term_memory'
+export MEMORY_CONTAINER_NAME=<your_memory_container_name>  # Defaults to 'strands_long_term'
 export SESSION_ID=<your_session_id>                        # Defaults to 'demo_long_term_session'
 export USER_ID=<your_user_id>                              # Defaults to 'demo_user'
 export AGENT_ID=<your_agent_id>                            # Defaults to 'demo_agent'
@@ -193,4 +193,124 @@ So yes, I know that your name is Bob and your current hobby is playing basketbal
 
 👤 You: q
 🤖 Assistant: Goodbye!
+```
+
+## LangGraph (Short-term memory)
+
+1. Set environment variables
+
+```bash
+# OpenSearch domain configuration (Required)
+export OPENSEARCH_URL=<your_opensearch_cluster_endpoint>
+export OPENSEARCH_USERNAME=<your_opensearch_domain_username>
+export OPENSEARCH_PASSWORD=<your_opensearch_domain_password>
+export OPENSEARCH_VERIFY_SSL=<true/false>                 # Defaults to false
+
+# Other configurations (Optional)
+export MEMORY_CONTAINER_NAME=<your_memory_container_name> # Defaults to 'langgraph_short_term'
+export BEDROCK_MODEL_ID=<your_bedrock_model_id>           # Defaults to 'anthropic.claude-3-sonnet-20240229-v1:0'
+```
+
+2. Set AWS credentials for Amazon Bedrock model
+
+```bash
+export AWS_REGION=<your_aws_region>
+export AWS_ACCESS_KEY_ID=<your_aws_access_key>
+export AWS_SECRET_ACCESS_KEY=<your_aws_secret_key>
+export AWS_SESSION_TOKEN=<your_aws_session_token>
+```
+
+3. Run the script
+
+```bash
+python langgraph/langgraph_short_term.py
+```
+
+The script creates an interactive chat session where you can converse with the AI agent. The agent maintains conversation history using OpenSearch's checkpoint storage, allowing it to remember the conversation context within the same thread.
+
+- Enter your messages at the "You:" prompt
+- Type `q` or `quit` to exit
+
+**Example conversation:**
+
+```
+% python langgraph/langgraph_short_term.py
+1. Setting up OpenSearch checkpointer...
+✅ Created memory container: 96fbqJoB6Os6SYy-ag4W
+
+2. Creating chatbot...
+✅ Chatbot ready
+
+LangGraph Interactive Demo
+Type 'q' or 'quit' to end the conversation
+
+👤 You: My name is Sarah and I love to bake!
+⚠️  No checkpoint found for thread_id=demo_20251121_160912, checkpoint_ns=, checkpoint_id=None
+🤖 Assistant: That's wonderful that you enjoy baking, Sarah! Baking can be such a creative and rewarding hobby. What are some of your favorite things to bake? Do you have any specialties or signature recipes you're particularly proud of? I'd love to hear more about your passion for baking.
+
+👤 You: I like to bake a pie
+🤖 Assistant: Ooh, pies are delicious! There are so many wonderful varieties of pies to bake. Do you have a favorite type of pie that you especially enjoy making? Fruit pies, cream pies, savory pies? I'm also very curious about your pie crust - do you make your own crust from scratch or do you use a pre-made crust? Getting that perfect, flaky pie crust can be a real challenge. I'd love to hear any tips or secrets you've learned for baking amazing pies. Pie-making is definitely an art!
+
+👤 You: Do you know my name and hobby?
+🤖 Assistant: Yes, you mentioned that your name is Sarah and that you love to bake. Specifically, you said "I like to bake a pie" when I asked about your baking hobby.
+
+👤 You: q
+🤖 Assistant: Goodbye!
+
+======================================================================
+
+📊 Session Summary:
+Thread ID: demo_20251121_155903
+Total messages: 6
+Session ended: 2025-11-21 15:59:18.735745
+```
+
+
+4. Resume existing conversation (Optional)
+
+You can resume previous conversations by running the checkpoint resume script and providing the memory container ID and thread ID. The conversation will continue with full context preserved from the previous session:
+
+```bash
+python langgraph/langgraph_resume.py
+```
+
+**Example resuming a conversation:**
+
+```
+% python langgraph/langgraph_resume.py
+LangGraph Checkpoint Resume
+Enter container ID: 96fbqJoB6Os6SYy-ag4W
+Enter thread ID: demo_20251121_155903
+
+======================================================================
+RESUMING EXISTING THREAD: demo_20251121_155903
+======================================================================
+
+Messages found: 6
+
+Conversation history:
+  [1] User: My name is Sarah and I love to bake!
+  [2] AI: That's wonderful that you enjoy baking, Sarah! Baking can be such a creative and...
+  [3] User: I like to bake a pie
+  [4] AI: Ooh, pies are delicious! There are so many wonderful varieties of pies to bake. ...
+  [5] User: Do you know my name and hobby?
+  [6] AI: Yes, you mentioned that your name is Sarah and that you love to bake. Specifical...
+
+Continuing conversation at 2025-11-21 16:10:24.241492
+Type 'q' or 'quit' to end the conversation
+
+👤 You: Can you summarize what we discussed?
+🤖 Assistant: Sure, here's a summary of our discussion:
+
+You introduced yourself as Sarah and said you love to bake. When I asked about your baking hobby, you specifically mentioned that you like to bake pies. I then asked some follow-up questions about what kinds of pies you enjoy making - fruit pies, cream pies, savory pies, etc. I also asked about whether you make your own pie crust from scratch or use a pre-made crust. I commented that achieving a perfect, flaky pie crust can be challenging and said I'd be interested in any tips or secrets you've learned for baking great pies. Finally, you checked to make sure I had retained your name (Sarah) and your stated hobby (baking, specifically pies).
+
+👤 You: q
+🤖 Assistant: Goodbye!
+
+======================================================================
+
+📊 Session Summary:
+Thread ID: demo_20251121_155903
+Total messages: 8
+Session ended: 2025-11-21 16:10:45.442957
 ```
