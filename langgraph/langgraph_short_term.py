@@ -79,6 +79,20 @@ def setup_opensearch_checkpointer(container_name: str, index_prefix: str) -> Ope
                 "disable_history": False,
                 "disable_session": False,
                 "use_system_index": False,
+                "index_settings": {
+                    "session_index": {
+                        "index": {
+                        "number_of_shards": "1",
+                        "auto_expand_replicas": "0-all"
+                        }
+                    },
+                    "working_memory_index": {
+                        "index": {
+                        "number_of_shards": "1",
+                        "auto_expand_replicas": "0-all"
+                        }
+                    }
+                }
             },
             auth=auth,
             verify_ssl=verify_ssl,

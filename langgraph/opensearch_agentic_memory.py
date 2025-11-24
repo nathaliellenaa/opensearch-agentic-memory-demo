@@ -90,7 +90,33 @@ class OpenSearchAgenticMemory:
                             "type": "SEMANTIC",
                             "namespace": ["user_id"]
                         }
-                    ]
+                    ],
+                    "index_settings": {
+                        "session_index": {
+                            "index": {
+                            "number_of_shards": "1",
+                            "auto_expand_replicas": "0-all"
+                            }
+                        },
+                        "working_memory_index": {
+                            "index": {
+                            "number_of_shards": "1",
+                            "auto_expand_replicas": "0-all"
+                            }
+                        },
+                        "long_term_memory_index": {
+                            "index": {
+                            "number_of_shards": "1",
+                            "auto_expand_replicas": "0-all"
+                            }
+                        },
+                        "long_term_memory_history_index": {
+                            "index": {
+                            "number_of_shards": "1",
+                            "auto_expand_replicas": "0-all"
+                            }
+                        }
+                    }
                 }
             }
         else:
@@ -101,7 +127,21 @@ class OpenSearchAgenticMemory:
                 "configuration": {
                     "index_prefix": index_prefix,
                     "use_system_index": False,
-                    "disable_session": False
+                    "disable_session": False,
+                    "index_settings": {
+                        "session_index": {
+                            "index": {
+                            "number_of_shards": "1",
+                            "auto_expand_replicas": "0-all"
+                            }
+                        },
+                        "working_memory_index": {
+                            "index": {
+                            "number_of_shards": "1",
+                            "auto_expand_replicas": "0-all"
+                            }
+                        }
+                    }
                 }
             }
 

@@ -1,10 +1,9 @@
 import os
-import sys
 from datetime import datetime
-from pathlib import Path
 from langchain_aws import ChatBedrock
-from langchain_core.messages import HumanMessage
+from langchain_core.messages import HumanMessage, SystemMessage
 from langgraph.graph import StateGraph, MessagesState, START, END
+from langgraph.prebuilt import ToolNode
 from opensearch_checkpoint_saver import OpenSearchSaver
 from opensearch_memory_tool import OpenSearchMemoryToolProvider
 
@@ -41,16 +40,29 @@ def create_chatbot(checkpointer, memory_tools):
         model_kwargs={"temperature": 0.7, "max_tokens": 1024}
     )
     
+    model_with_tools = model.bind_tools(memory_tools)
+
     def chat_node(state: MessagesState):
-        # Add memory tools to the model
-        model_with_tools = model.bind_tools(memory_tools)
-        return {"messages": [model_with_tools.invoke(state["messages"])]}
-        # return {"messages": [model.invoke(state["messages"])]}
+        messages = state["messages"]
+        if not any(isinstance(msg, SystemMessage) for msg in messages):
+            system_msg = SystemMessage(content="You are a helpful assistant with long-term memory capabilities. Always store it using the opensearch_memory tool so you can remember it in future conversations.")
+            messages = [system_msg] + messages
+        return {"messages": [model_with_tools.invoke(messages)]}
+
+    def should_continue(state: MessagesState):
+        messages = state['messages']
+        last_message = messages[-1]
+        if last_message.tool_calls:
+            return "tools"
+        return END
     
     graph = StateGraph(MessagesState)
     graph.add_node("chat", chat_node)
+    graph.add_node("tools", ToolNode(memory_tools))
+    
     graph.add_edge(START, "chat")
-    graph.add_edge("chat", END)
+    graph.add_conditional_edges("chat", should_continue)
+    graph.add_edge("tools", "chat")
     
     return graph.compile(checkpointer=checkpointer)
 
@@ -81,7 +93,6 @@ def setup_opensearch_checkpointer(container_name: str, index_prefix: str) -> Ope
     """
     auth = (username, password)
 
-    # Try to create container (will fail if already exists, which is fine)
     try:
         container_id = OpenSearchSaver.create_memory_container(
             base_url=cluster_url,
@@ -92,6 +103,32 @@ def setup_opensearch_checkpointer(container_name: str, index_prefix: str) -> Ope
                 "disable_history": False,
                 "disable_session": False,
                 "use_system_index": False,
+                "index_settings": {
+                    "session_index": {
+                        "index": {
+                        "number_of_shards": "1",
+                        "auto_expand_replicas": "0-all"
+                        }
+                    },
+                    "working_memory_index": {
+                        "index": {
+                        "number_of_shards": "1",
+                        "auto_expand_replicas": "0-all"
+                        }
+                    },
+                    "long_term_memory_index": {
+                        "index": {
+                        "number_of_shards": "1",
+                        "auto_expand_replicas": "0-all"
+                        }
+                    },
+                    "long_term_memory_history_index": {
+                        "index": {
+                        "number_of_shards": "1",
+                        "auto_expand_replicas": "0-all"
+                        }
+                    }
+                }
             },
             auth=auth,
             verify_ssl=verify_ssl,

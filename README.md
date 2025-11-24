@@ -362,36 +362,40 @@ The script creates an interactive chat session with long-term memory capabilitie
 
 ```
 % python langgraph/langgraph_long_term.py
-Created embedding model with id '4qcHt5oB6Os6SYy-8A86'
-Created LLM model with id '5KcHt5oB6Os6SYy-8A_L'
-Created memory container with id '5acHt5oB6Os6SYy-8Q8X'
+Created embedding model with id 'HqchuJoB6Os6SYy-cxHw'
+Created LLM model with id 'IKchuJoB6Os6SYy-dBFz'
+Created memory container with id 'IachuJoB6Os6SYy-dBGq'
 
 1. Setting up OpenSearch checkpointer...
-✅ Use memory container with ID: 5acHt5oB6Os6SYy-8Q8X
+✅ Use memory container with ID: IachuJoB6Os6SYy-dBGq
 
 2. Creating chatbot...
 ✅ Chatbot ready
 
-Starting new thread: demo_20251124_100223
+Starting new thread: demo_20251124_150952
 LangGraph Interactive Demo
 Type 'q' or 'quit' to end the conversation
 
-👤 You: Hello, my name is Saran and I love to bake!
-⚠️  No checkpoint found for thread_id=demo_20251124_100223, checkpoint_ns=, checkpoint_id=None
-🤖 Assistant: Hello Saran, it's great to meet a fellow baking enthusiast! Baking is such a wonderful hobby - there's nothing quite like the delicious aroma of freshly baked goods wafting through the kitchen. What are some of your favorite things to bake? I personally love making breads, cookies, and pies from scratch. The process of precisely measuring ingredients, kneading dough, and watching baked goods rise in the oven is so satisfying. Do you have any go-to recipes you'd recommend or baking tips to share?
+👤 You: My name is Sarah and I love to bake
+⚠️  No checkpoint found for thread_id=demo_20251124_150952, checkpoint_ns=, checkpoint_id=None
+╭───────────────────────── Add long-term memory for session langgraph_long_term_session, agent langgraph_agent ─────────────────────────╮
+│ User Sarah loves to bake                                                                                                                │
+╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+╭───────────────────────────────────────────────────────────── Memory Stored ─────────────────────────────────────────────────────────────╮
+│ ✅ Memory stored successfully:                                                                                                          │
+│ 🔑 Memory ID: N6chuJoB6Os6SYy-oRFt                                                                                                      │
+╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+🤖 Assistant: Nice to meet you Sarah! That's wonderful that you enjoy baking. I love the aroma of freshly baked goods. What are some of your favorite things to bake? I'd be happy to share recipes or baking tips if you're interested.
 
 👤 You: I like to bake a pie
-🤖 Assistant: Wonderful, pies are such a classic baked good! There are so many delicious varieties to choose from - fruit pies, cream pies, savory pies. Do you have a favorite type of pie you enjoy baking? 
-
-Some tips for baking great pies:
-
-- Use cold ingredients for the crust - this helps create a flakier texture when baked.
-- Don't overwork the pie dough when mixing and rolling it out. Handling it too much can cause the dough to become tough.
-- For fruit pies, let the filling cool slightly before adding it to the unbaked crust so it doesn't make the bottom soggy.
-- Brush the top crust with an egg wash or milk before baking for a beautiful golden brown color.
-- Let pies cool completely on a wire rack before slicing to allow the filling to set properly.
-
-I'd love to hear about your favorite pie recipe and any special tips or techniques you use when baking pies! Swapping baking wisdom is half the fun for pie enthusiasts.
+╭───────────────────────── Add long-term memory for session langgraph_long_term_session, agent langgraph_agent ─────────────────────────╮
+│ Sarah likes to bake pies                                                                                                                │
+╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+╭───────────────────────────────────────────────────────────── Memory Stored ─────────────────────────────────────────────────────────────╮
+│ ✅ Memory stored successfully:                                                                                                          │
+│ 🔑 Memory ID: R6chuJoB6Os6SYy-0xEb                                                                                                      │
+╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+🤖 Assistant: Pies are delicious! I love a good fruit pie, especially apple or cherry. Do you have a favorite type of pie you like to bake? Baking pies can be an art with getting that perfect flaky crust. I'd love to hear any tips or secrets you've learned for making great pies. Baking is such a rewarding hobby.
 
 👤 You: q
 🤖 Assistant: Goodbye!
@@ -399,28 +403,36 @@ I'd love to hear about your favorite pie recipe and any special tips or techniqu
 ======================================================================
 
 📊 Session Summary:
-Thread ID: demo_20251124_100223
-Total messages: 4
-Session ended: 2025-11-24 10:03:03.623017
+Thread ID: demo_20251124_150952
+Total messages: 8
+Session ended: 2025-11-24 15:10:26.668944
 
 # New session
 % python langgraph/langgraph_long_term.py
-Find memory container with id '5acHt5oB6Os6SYy-8Q8X' by name 'langgraph_long_term_demo'
+Find memory container with id 'IachuJoB6Os6SYy-dBGq' by name 'langgraph_long_term'
 
 1. Setting up OpenSearch checkpointer...
-✅ Use memory container with ID: 5acHt5oB6Os6SYy-8Q8X
+✅ Use memory container with ID: IachuJoB6Os6SYy-dBGq
 
 2. Creating chatbot...
 ✅ Chatbot ready
 
-Found existing thread: demo_20251124_100223
+Found existing thread: demo_20251124_150952
 Resume existing conversation? (y/n): y
-Resuming thread: demo_20251124_100223
+Resuming thread: demo_20251124_150952
 LangGraph Interactive Demo
 Type 'q' or 'quit' to end the conversation
 
 👤 You: Do you know my name and hobby?
-🤖 Assistant: Yes, you mentioned earlier that your name is Saran and that you love to bake.
+╭──────────────────────────────────────────────────────────── Search Results ─────────────────────────────────────────────────────────────╮
+│                              Long term memories                                                                                         │
+│ ┏━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓                                                           │
+│ ┃ Memory ID            ┃ Content                                            ┃                                                           │
+│ ┡━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┩                                                           │
+│ │ P6chuJoB6Os6SYy-sxEW │ Sarah loves to bake, especially pies.              │                                                           │
+│ └──────────────────────┴────────────────────────────────────────────────────┘                                                           │
+╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+🤖 Assistant: Yes, from the memories I have stored, I know your name is Sarah and that you enjoy baking, especially pies. Baking pies is a wonderful hobby - there's something so satisfying about making a delicious pie from scratch with a flaky crust. Do you have a favorite type of pie you like to bake or a special family recipe? I'd love to hear more about your pie baking adventures!
 
 👤 You: q
 🤖 Assistant: Goodbye!
@@ -428,7 +440,7 @@ Type 'q' or 'quit' to end the conversation
 ======================================================================
 
 📊 Session Summary:
-Thread ID: demo_20251124_100223
-Total messages: 6
-Session ended: 2025-11-24 10:04:14.895861
+Thread ID: demo_20251124_150952
+Total messages: 12
+Session ended: 2025-11-24 15:12:09.996516
 ```

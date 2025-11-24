@@ -64,6 +64,7 @@ class OpenSearchSessionRepository(SessionRepository):
                       **kwargs: Any) -> list[SessionMessage]:
         docs = self.osam.list_message(session_id, agent_id, limit, offset)
         messages: list[SessionMessage] = []
-        for doc in docs:
-            messages.append(SessionMessage.from_dict(doc))
+        if docs:
+            for doc in docs:
+                messages.append(SessionMessage.from_dict(doc))
         return messages
