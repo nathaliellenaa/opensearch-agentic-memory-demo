@@ -245,7 +245,7 @@ class OpenSearchSaver(BaseCheckpointSaver[str]):
         doc = hits[0]["_source"]
 
         # Extract checkpoint data from structured_data
-        checkpoint_b64 = doc["structured_data"]["checkpoint"]
+        checkpoint_b64 = doc["binary_data"]
         checkpoint_type = doc["structured_data"]["checkpoint_type"]
         metadata_b64 = doc["structured_data"]["metadata"]
         parent_checkpoint_id = doc["namespace"].get("parent_checkpoint_id")
@@ -335,7 +335,7 @@ class OpenSearchSaver(BaseCheckpointSaver[str]):
             writes_hits = writes_data.get("hits", {}).get("hits", [])
             pending_writes = []
             for w in writes_hits:
-                value_b64 = w["_source"]["structured_data"]["value"]
+                value_b64 = w["_source"]["binary_data"]
                 value_type = w["_source"]["structured_data"]["value_type"]
                 channel = w["_source"]["structured_data"]["channel"]
                 
@@ -411,11 +411,11 @@ class OpenSearchSaver(BaseCheckpointSaver[str]):
                 )
 
         # Add metadata filters
-        if filter:
-            for key, value in filter.items():
-                must_clauses.append(
-                    {"term": {f"structured_data.metadata.{key}": value}}
-                )
+        # if filter:
+        #     for key, value in filter.items():
+        #         must_clauses.append(
+        #             {"term": {f"structured_data.metadata.{key}": value}}
+        #         )
 
         query = {
             "query": {"bool": {"must": must_clauses}},
@@ -439,7 +439,7 @@ class OpenSearchSaver(BaseCheckpointSaver[str]):
 
         for hit in data.get("hits", {}).get("hits", []):
             doc = hit["_source"]
-            checkpoint_b64 = doc["structured_data"]["checkpoint"]
+            checkpoint_b64 = doc["binary_data"] 
             checkpoint_type = doc["structured_data"]["checkpoint_type"]
             metadata_b64 = doc["structured_data"]["metadata"]
             parent_checkpoint_id = doc["namespace"].get("parent_checkpoint_id")
@@ -575,8 +575,8 @@ class OpenSearchSaver(BaseCheckpointSaver[str]):
         memory_doc = {
             "payload_type": "data",
             "checkpoint_id": checkpoint["id"],  # UUID v6 with embedded timestamp
+            "binary_data": checkpoint_b64,
             "structured_data": {
-                "checkpoint": checkpoint_b64,
                 "checkpoint_type": type_,
                 "metadata": metadata_b64,
                 "messages": messages,
@@ -666,9 +666,9 @@ class OpenSearchSaver(BaseCheckpointSaver[str]):
             write_doc = {
                 "payload_type": "data",
                 "checkpoint_id": checkpoint_id,  # UUID for identification
+                "binary_data": value_b64,
                 "structured_data": {
                     "channel": channel,
-                    "value": value_b64,
                     "value_type": type_,
                 },
                 "namespace": {

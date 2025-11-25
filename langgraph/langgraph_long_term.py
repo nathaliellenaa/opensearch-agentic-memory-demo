@@ -21,7 +21,7 @@ verify_ssl = os.getenv("OPENSEARCH_VERIFY_SSL", "false").lower() == "true"
 memory_container_name = os.getenv('MEMORY_CONTAINER_NAME', 'langgraph_long_term')
 
 # AWS Bedrock configuration
-bedrock_model_id = os.getenv("BEDROCK_MODEL_ID", "anthropic.claude-3-sonnet-20240229-v1:0")
+bedrock_model_id = os.getenv("BEDROCK_MODEL_ID", "global.anthropic.claude-opus-4-5-20251101-v1:0")
 aws_region = os.getenv("AWS_REGION", "us-east-1")
 
 # Model configuration for long-term memory
@@ -45,7 +45,7 @@ def create_chatbot(checkpointer, memory_tools):
     def chat_node(state: MessagesState):
         messages = state["messages"]
         if not any(isinstance(msg, SystemMessage) for msg in messages):
-            system_msg = SystemMessage(content="You are a helpful assistant with long-term memory capabilities. Always store it using the opensearch_memory tool so you can remember it in future conversations.")
+            system_msg = SystemMessage(content="You are a helpful assistant.")
             messages = [system_msg] + messages
         return {"messages": [model_with_tools.invoke(messages)]}
 
