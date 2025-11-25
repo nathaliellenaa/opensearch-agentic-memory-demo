@@ -208,7 +208,7 @@ export OPENSEARCH_VERIFY_SSL=<true/false>                 # Defaults to false
 
 # Other configurations (Optional)
 export MEMORY_CONTAINER_NAME=<your_memory_container_name> # Defaults to 'langgraph_short_term'
-export BEDROCK_MODEL_ID=<your_bedrock_model_id>           # Defaults to 'anthropic.claude-3-sonnet-20240229-v1:0'
+export BEDROCK_MODEL_ID=<your_bedrock_model_id>           # Defaults to 'global.anthropic.claude-opus-4-5-20251101-v1:0'
 ```
 
 2. Set AWS credentials for Amazon Bedrock model
@@ -308,7 +308,7 @@ export OPENSEARCH_VERIFY_SSL=<true/false>                 # Defaults to false
 # Model configuration (Optional - auto-created if not provided)
 export EMBEDDING_MODEL_ID=<your_embedding_model_id>        # Defaults to Amazon Titan Embedding model
 export LLM_MODEL_ID=<your_llm_model_id>                    # Default to Amazon Bedrock Claude model
-export BEDROCK_MODEL_ID=<your_bedrock_model_id>            # Defaults to 'anthropic.claude-3-sonnet-20240229-v1:0'
+export BEDROCK_MODEL_ID=<your_bedrock_model_id>            # Defaults to 'global.anthropic.claude-opus-4-5-20251101-v1:0'
 
 # Memory and session configuration (Optional)
 export MEMORY_CONTAINER_NAME=<your_memory_container_name>  # Defaults to 'langgraph_long_term'

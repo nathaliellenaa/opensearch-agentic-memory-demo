@@ -19,7 +19,7 @@ verify_ssl = os.getenv("OPENSEARCH_VERIFY_SSL", "false").lower() == "true"
 memory_container_name = os.getenv('MEMORY_CONTAINER_NAME', 'langgraph_short_term')
 
 # AWS Bedrock configuration
-bedrock_model_id = os.getenv("BEDROCK_MODEL_ID", "anthropic.claude-3-sonnet-20240229-v1:0")
+bedrock_model_id = os.getenv("BEDROCK_MODEL_ID", "global.anthropic.claude-opus-4-5-20251101-v1:0")
 aws_region = os.getenv("AWS_REGION", "us-east-1")
 
 def create_chatbot(checkpointer):

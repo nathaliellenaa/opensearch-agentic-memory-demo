@@ -507,7 +507,7 @@ class OpenSearchAgenticMemory:
         "description": "LLM model for memory processing",
         "connector": {
                 "name": "Amazon Bedrock Connector: LLM",
-                "description": "The connector to bedrock Claude 3.7 sonnet model",
+                "description": "The connector to bedrock Claude Opus 4.5 model",
                 "version": 1,
                 "protocol": "aws_sigv4",
                 "parameters": {
@@ -516,7 +516,7 @@ class OpenSearchAgenticMemory:
                     "max_tokens": 8000,
                     "temperature": 1,
                     "anthropic_version": "bedrock-2023-05-31",
-                    "model": "us.anthropic.claude-3-7-sonnet-20250219-v1:0"
+                    "model": "global.anthropic.claude-opus-4-5-20251101-v1:0"
                 },
                 "credential": {
                     "access_key": aws_access_key,
